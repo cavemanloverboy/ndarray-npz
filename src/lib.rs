@@ -149,6 +149,22 @@ impl<W: Write + Seek> NpzWriter<W> {
 		}
 	}
 
+	/// Creates a new `.npz` file without compression. See [`numpy.savez`].
+	///
+	/// Ensures `.npy` files are 64-byte aligned for memory-mapping via [`NpzView`]/[`NpzViewMut`].
+	///
+	/// [`numpy.savez`]: https://numpy.org/doc/stable/reference/generated/numpy.savez.html
+	#[must_use]
+	pub fn new_with_large_file_option(writer: W) -> NpzWriter<W> {
+		NpzWriter {
+			zip: ZipWriter::new(writer),
+			options: SimpleFileOptions::default()
+				.with_alignment(64)
+				.compression_method(CompressionMethod::Stored)
+				.large_file(true),
+		}
+	}
+
 	/// Creates a new `.npz` file with compression. See [`numpy.savez_compressed`].
 	///
 	/// [`numpy.savez_compressed`]: https://numpy.org/doc/stable/reference/generated/numpy.savez_compressed.html
